@@ -9,10 +9,10 @@ import org.junit.Test;
 
 public class HsqldbMojoTest {
 
-    private StartHsqldbMojo startMojo;
-    private StopHsqldbMojo stopMojo;
+    protected StartHsqldbMojo startMojo;
+    protected StopHsqldbMojo stopMojo;
 
-    private static void configureMojo(AbstractHsqldbMojo mojo) throws MojoExecutionException {
+    protected static void configureMojo(AbstractHsqldbMojo mojo) throws MojoExecutionException {
         mojo.driver = "org.hsqldb.jdbcDriver";
         mojo.address = "localhost";
         mojo.name = "xdb";
