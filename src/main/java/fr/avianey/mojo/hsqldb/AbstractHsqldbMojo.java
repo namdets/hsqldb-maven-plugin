@@ -3,6 +3,7 @@ package fr.avianey.mojo.hsqldb;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,16 +26,22 @@ public abstract class AbstractHsqldbMojo extends AbstractMojo {
     public int port;
 
     /**
-     * The name to use for the database.
+     * The name to use for the database if there is no databases list.
      */
     @Parameter(property = "hsqldb.name", defaultValue = "xdb")
     public String name;
 
     /**
-     * The path to use for the database.
+     * The path to use for the database if there is no databases list.
      */
     @Parameter(property = "hsqldb.path", defaultValue = "mem:test")
     public String path;
+
+    /**
+     * A list of databases to host from the HSQLDB server.
+     */
+    @Parameter(required = false)
+    public List<DatabaseNamePathPair> databases;
 
     /**
      * The username to use when authenticating.
@@ -116,8 +123,15 @@ public abstract class AbstractHsqldbMojo extends AbstractMojo {
             if (port > 0) {
                 server.setPort(port);
             }
+            // For backwards compatability
             server.setDatabaseName(0, name);
             server.setDatabasePath(0, path);
+            // For multiple schema support
+            for(int x = 0; databases != null && x < databases.size(); x++){
+                DatabaseNamePathPair databaseNamePathPair = databases.get(x);
+		        server.setDatabaseName(x + 1, databaseNamePathPair.getName());
+                server.setDatabasePath(x + 1, databaseNamePathPair.getPath());
+            }
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -140,6 +154,18 @@ public abstract class AbstractHsqldbMojo extends AbstractMojo {
             sb.append(":").append(port);
         }
         sb.append("/").append(name);
+        return sb.toString();
+    }
+
+    protected String getConnectionURI(String dataSourceName) {
+        if (connectionURL != null) {
+            return connectionURL;
+        }
+        StringBuilder sb = new StringBuilder("jdbc:hsqldb:hsql://").append(address);
+        if (port > 0) {
+            sb.append(":").append(port);
+        }
+        sb.append("/").append(dataSourceName);
         return sb.toString();
     }
 
@@ -167,4 +193,8 @@ public abstract class AbstractHsqldbMojo extends AbstractMojo {
         return DriverManager.getConnection(getConnectionURI(), username, password);
     }
     
+    protected Connection getConnection(String dataSourceName) throws SQLException, ClassNotFoundException {
+        Class.forName(driver);
+        return DriverManager.getConnection(getConnectionURI(dataSourceName), username, password);
+    }
 }
