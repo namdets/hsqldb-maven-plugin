@@ -26,6 +26,11 @@ public class StopHsqldbMojo extends AbstractHsqldbMojo {
                 return;
             }
             try {
+            	if(databases!=null){
+            		for(DatabaseNamePathPair db : databases){
+            			getConnection(db.getName()).prepareStatement("shutdown").execute();		
+            		}
+            	}
                 getConnection().prepareStatement("shutdown").execute();
             } catch (SQLException e) {
                 if (isClosed()) {

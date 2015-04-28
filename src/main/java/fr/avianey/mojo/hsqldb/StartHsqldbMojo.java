@@ -37,6 +37,11 @@ public class StartHsqldbMojo extends AbstractHsqldbMojo {
                         break;
                     }
                     getLog().info("HSQLDB server started on " + getConnectionURI());
+                    if(databases != null){
+                    	for(DatabaseNamePathPair db : databases){
+                    		getLog().info("HSQLDB server started on " + getConnectionURI(db.getName()));	
+                    	}
+                    }
                 } else {
                     throw new MojoExecutionException("Failed to start the HSQLDB server");
                 }
