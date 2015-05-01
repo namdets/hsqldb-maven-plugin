@@ -3,7 +3,11 @@ package fr.avianey.mojo.hsqldb;
 public class DatabaseNamePathPair {
 	private String name;
 	private String path;
-	
+
+    public DatabaseNamePathPair(){
+        super();
+    }
+
 	public DatabaseNamePathPair(String name, String path) {
 		super();
 		this.name = name;
